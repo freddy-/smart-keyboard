@@ -1,0 +1,375 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>SmartKeyboard</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="hammer.min.js"></script>
+
+	<style type="text/css">
+
+	* {
+		outline: none;
+	}
+
+	html{
+		height: 100%;
+	}
+
+	body{
+		height: 100%;
+		background-color: rgba(0, 93, 255, 0.04);    
+		margin-top: 0;
+    	margin-bottom: 0;
+	}
+
+	.input-texto-div {		
+    	width: 100%;
+    	position: relative;
+	}
+
+	.input-texto {
+		margin-top: 20px;
+	    width: 92%;
+	    height: 50px;
+	    font-size: 18px;
+	    display: block;
+	    border: 1px solid rgba(1, 1, 1, 0.09);
+	    border-radius: 5px;
+	    box-shadow: 0 1px 3px -2px rgba(0, 0, 0, 0.47);
+	    padding-right: 8%;
+	}
+
+	.input-texto-div button {
+	    position: absolute;
+    	right: 0;
+    	top: 0;
+    	height: 100%;
+    	width: 38px;
+    	background: none;
+    	border: none;
+    	box-shadow: none;
+    	padding-top: 7px;
+	}
+
+
+	button{
+	    background-color: rgb(33,34,36);
+	    color: white;	    
+    	border: 1px solid black;
+	    border-radius: 5px;
+	    box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.47);
+	}
+
+	.botoes-f {
+		margin-top: 10px;
+	}
+
+	.botoes-f div{
+		width: 100%;
+    	overflow: auto;
+    	white-space: nowrap;
+    	height: 37px;
+	}
+
+	.botoes-f button{
+		display: inline-block;
+		width: 70px;
+		height: 35px;
+		margin-left: 5px;
+	}
+
+	.botoes-f button:first-child{
+		margin-left: 0px;
+	}
+
+	.big {
+		margin-top: 3px;
+		width: 100%;
+		height: 60px;
+	}
+
+	.misc{
+		margin-top: 5px;
+		overflow: auto;
+	}
+
+	.misc button{
+		height: 60px;
+	}
+
+	.misc .clear{
+	    width: 49%;
+	    float: left;
+	}
+
+	.misc .ctrl-a{
+	    width: 49%;
+	    float: right;
+	}
+
+	.box {
+	  	display: flex;
+	  	flex-flow: column;
+	  	height: 100%;
+	}
+
+	.box .keyboard {
+	  	flex: 0 1 auto;
+	}
+
+	.box .track-pad-region {
+		flex: 1 1 auto;
+	  	display: flex;
+	    margin-top: 3px;
+	    margin-bottom: 3px;
+	}
+
+	.box .track-pad {
+		touch-action: none !important;
+		flex: 1 1 auto;
+		width: 100%;
+	    background-color: #dedede;
+	    border-radius: 13px;
+	    border-top-right-radius: 0px;
+	    border-bottom-right-radius: 0px;
+	    border: 2px solid rgb(109, 109, 109);
+	    border-right: none;
+	    box-sizing: border-box;
+	}
+
+	.box .track-pad-scroll {		
+		touch-action: none !important;
+    	flex: 1 1 auto;
+	    background-color: #dedede;
+	    border-radius: 13px;
+	    border-top-left-radius: 0px;
+	    border-bottom-left-radius: 0px;
+	    border: 2px solid rgb(109, 109, 109);
+	    border-left: none;
+	    box-sizing: border-box;
+    	width: 50px;	
+	}
+	
+	.box .track-pad-scroll div{
+	    height: 100%;
+	    background-color: gray;
+	    width: 3px;
+	    margin-left: 15px;
+	    border-top: 15px solid #dedede;
+	    border-bottom: 15px solid #dedede;
+	    box-sizing: border-box;
+	}
+
+	</style>
+
+</head>
+
+<body>		
+	<div class="box">
+		<div class="keyboard">
+			<div class="input-texto-div">
+				<input class="input-texto" type="text"/>
+				<button type="button" onclick="sendText(); return false;"><img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjE2cHgiIGhlaWdodD0iMTZweCIgdmlld0JveD0iMCAwIDQ0NC44MTkgNDQ0LjgxOSIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNDQ0LjgxOSA0NDQuODE5OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnPgoJPHBhdGggZD0iTTM1Mi4wMjUsMTk2LjcxMkwxNjUuODg0LDEwLjg0OEMxNTkuMDI5LDMuNjE1LDE1MC40NjksMCwxNDAuMTg3LDBjLTEwLjI4MiwwLTE4Ljg0MiwzLjYxOS0yNS42OTcsMTAuODQ4TDkyLjc5MiwzMi4yNjQgICBjLTcuMDQ0LDcuMDQzLTEwLjU2NiwxNS42MDQtMTAuNTY2LDI1LjY5MmMwLDkuODk3LDMuNTIxLDE4LjU2LDEwLjU2NiwyNS45ODFsMTM4Ljc1MywxMzguNDczTDkyLjc4NiwzNjEuMTY4ICAgYy03LjA0Miw3LjA0My0xMC41NjQsMTUuNjA0LTEwLjU2NCwyNS42OTNjMCw5Ljg5NiwzLjUyMSwxOC41NjIsMTAuNTY0LDI1Ljk4bDIxLjcsMjEuNDEzICAgYzcuMDQzLDcuMDQzLDE1LjYxMiwxMC41NjQsMjUuNjk3LDEwLjU2NGMxMC4wODksMCwxOC42NTYtMy41MjEsMjUuNjk3LTEwLjU2NGwxODYuMTQ1LTE4NS44NjQgICBjNy4wNDYtNy40MjMsMTAuNTcxLTE2LjA4NCwxMC41NzEtMjUuOTgxQzM2Mi41OTcsMjEyLjMyMSwzNTkuMDcxLDIwMy43NTUsMzUyLjAyNSwxOTYuNzEyeiIgZmlsbD0iIzIxMjIyNCIvPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=" /></button>
+			</div>
+
+			<div class="botoes-f">
+				<div>
+				</div>
+			</div>
+
+			<button type="button" class="big enter">enter</button>
+
+			<div class="misc">
+				<button type="button" class="clear">limpar</button>
+				<button type="button" class="ctrl-a">Ctrl + A</button>
+			</div>
+		</div>
+
+		<div class="track-pad-region">			
+			<div class="track-pad"></div>
+			<div class="track-pad-scroll"><div/></div>
+		</div>
+
+	</div>
+
+	<script>
+
+	$(function(){
+		var $listaBotoesFuncao = $(".botoes-f div");
+		for (var i = 0; i < 12; i++) {
+			$listaBotoesFuncao.append('<button type="button" funcao="f' + (i + 1) + '" >F' + (i + 1) + '</button>');
+		};
+
+		$(".botoes-f button").click(function(event){
+			event.preventDefault();
+			var funcao = $(this).attr("funcao");
+			sendFunctionKey(funcao);
+		});
+
+		$(".enter").click(function(event){
+			event.preventDefault();
+			sendEnter();
+		});
+
+		$(".clear").click(function(event){
+			event.preventDefault();
+			sendClear();
+		});
+
+		$(".ctrl-a").click(function(event){
+			event.preventDefault();
+			sendCtrlA();
+		});
+
+		var trackPad = document.getElementsByClassName("track-pad")[0];
+		var trackPadScroll = document.getElementsByClassName("track-pad-scroll")[0];
+
+		// create a simple instance
+		// by default, it only adds horizontal recognizers
+		var tp = new Hammer(trackPad);
+		var scroll = new Hammer(trackPadScroll);
+		
+		// let the pan gesture support all directions.
+		// this will block the vertical scrolling on a touch-device while on the element
+		tp.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+		scroll.get('pan').set({ direction: Hammer.DIRECTION_VERTICAL });
+
+		var oldX = 0, oldY = 0;
+
+		// listen to events...
+		tp.on("panleft panright panup pandown", function(ev) {
+		  	console.log(ev.deltaX);
+		  	console.log(ev.deltaY);
+
+		  	var newX, newY;
+
+		  	if (ev.deltaX > oldX) {
+		  		newX = ev.deltaX;
+		  	}else if (ev.deltaX < oldX) {
+		  		newX = ev.deltaX;
+		  	}else {
+		  		newX = 0;
+		  	}
+
+		  	if (ev.deltaY > oldY) {
+		  		newY = ev.deltaY;
+		  	}else if (ev.deltaY < oldY) {
+		  		newY = ev.deltaY;
+		  	}else {
+		  		newY = 0;
+		  	}
+
+		  	oldX = newX;
+		  	oldY = newY;
+
+		  	sendMousePosition(newX / 8, newY / 8 );
+		});
+
+		var lastDir;
+		var delayScroll = 0;
+
+		scroll.on("panup", function(ev){
+			if (lastDir === "up") {
+				if (delayScroll >= 3) {
+					delayScroll = 0;
+					scrollMouse("up");	
+				}else{
+					delayScroll++;
+				}
+			}else{
+				lastDir = "up"
+				delayScroll = 0;
+			}					
+		});
+
+		scroll.on("pandown", function(ev){
+			if (lastDir === "down") {
+				if (delayScroll >= 3) {
+					delayScroll = 0;
+					scrollMouse("down");	
+				}else{
+					delayScroll++;
+				}
+			}else{
+				lastDir = "down"
+				delayScroll = 0;
+			}
+		});
+
+		tp.on("tap", function(){
+			sendMouseClick();
+		});
+
+	});
+
+	function scrollMouse(direction){
+		$.ajax({
+			url: "/send/mouse/scroll/" + direction
+		});
+	}
+
+	function sendMousePosition(dX, dY){
+		$.ajax({
+			type: "POST",
+			url: "/send/mouse/move/",
+			data: JSON.stringify({x: dX, y: dY}),
+			contentType: "application/json; charset=utf-8",
+			dataType: "json"
+		});
+	}
+
+	function sendMouseClick(){
+		$.ajax({
+			url: "/send/mouse/click/"
+		});
+	}
+
+	function sendFunctionKey(fkey){
+		$.ajax({
+			url: "/send/key/" + fkey
+		});
+	}
+
+	function sendEnter(){
+		sendText();
+
+		$.ajax({
+			url: "/send/key/enter"
+		});
+	}
+
+	function sendText(){
+
+		if($("input[type=text]").val().length > 0){
+			$.ajax({
+				type: "POST",
+				url: "/send/string",
+				data: JSON.stringify({string: encodeURI($("input[type=text]").val())}),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json"
+			});
+			
+			$("input[type=text]").val("");
+		}
+		
+	}
+
+	function sendClear(){
+		$.ajax({
+			url: "/send/clear"
+		});
+	}
+
+	function sendCtrlA(){
+		$.ajax({
+			url: "/send/ctrla"
+		});
+	}
+
+	</script>
+</body>
+
+</html>
