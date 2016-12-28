@@ -1,1 +1,0 @@
-F:\DEV\node\nodejs\node.exe app.js
